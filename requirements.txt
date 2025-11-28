@@ -7,3 +7,6 @@ google-auth-oauthlib
 google-api-python-client
 
 google-generativeai
+speechrecognition
+gTTS
+gunicorn
