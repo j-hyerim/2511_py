@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>Gemini 음성 챗봇</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, system-ui, sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 2rem;
+      background: #181818;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    h1 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+      text-align: center;
+    }
+    .history {
+      border-radius: 12px;
+      padding: 1rem;
+      background: #101010;
+      max-height: 55vh;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+    .msg {
+      margin-bottom: 0.75rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .msg.user {
+      background: #243b52;
+      align-self: flex-end;
+    }
+    .msg.bot {
+      background: #262626;
+      align-self: flex-start;
+    }
+    .msg strong {
+      display: block;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-bottom: 0.2rem;
+    }
+    .empty {
+      color: #777;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+      max-height: 200px;
+      padding: 0.6rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #111;
+      color: #eee;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: #4b8df8;
+    }
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+    button {
+      padding: 0.6rem 1.1rem;
+      border-radius: 999px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .btn-text {
+      background: #4b8df8;
+      color: #fff;
+    }
+    .btn-voice {
+      background: #2f9d5c;
+      color: #fff;
+    }
+    button:hover {
+      filter: brightness(1.08);
+    }
+    audio {
+      width: 100%;
+      margin-top: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <h1>Gemini 음성 챗봇</h1>
+
+    <a href="../templates/chat.html">챗봇 바로가기</a>
+
+    <div class="history">
+      {% if chat_history %}
+        {% for sender, text in chat_history %}
+          <div class="msg {{ sender }}">
+            <strong>{{ "나" if sender == "user" else "봇" }}</strong>
+            <div>{{ text }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="empty">
+          아직 대화가 없어요. 아래에 텍스트를 입력하거나,<br>
+          <b>🎙 음성으로 질문하기</b> 버튼을 눌러서 말해보세요!
+        </p>
+      {% endif %}
+    </div>
+
+    <form method="POST">
+      <textarea name="user_input"
+                placeholder="텍스트로 질문을 입력하거나, 음성 버튼을 눌러보세요."></textarea>
+      <div class="buttons">
+        <button type="submit" name="action" value="stt" class="btn-voice">
+          🎙 음성으로 질문하기
+        </button>
+        <button type="submit" name="action" value="text" class="btn-text">
+          텍스트 보내기
+        </button>
+      </div>
+    </form>
+
+    {% if audio_ts %}
+      <!-- audio_ts를 쿼리스트링으로 붙여서 매번 새로운 URL처럼 보여서 캐시 방지 -->
+      <audio controls autoplay>
+        <source src="{{ url_for('tts_audio') }}?ts={{ audio_ts }}" type="audio/mpeg">
+        브라우저가 오디오 태그를 지원하지 않습니다.
+      </audio>
+    {% endif %}
+  </div>
+</body>
+</html>
